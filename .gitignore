@@ -1,0 +1,30 @@
+blockchain/**/node_modules
+okay process completed,
+
+our module one we need detailed explaination we take them one by one also avoid canvas pls
+
+- explain the folders created
+
+- introduction to soidity, what it is, solidity syntax
+
+- state and local variables
+
+visibility modifiers: public, private, internal, external
+
+mapping, structs, array
+
+functions: pure, view,  payable
+
+modifiers and error handing (require, assert, revert)
+
+inheritance and interfces
+
+custom error
+
+events and logging [touch html and css a little and show how this event and logging works]
+
+etherjs introduction
+
+
+
+module one project using the concepts covered -eth bank [with detailed explanation] frontend (reactjs)
