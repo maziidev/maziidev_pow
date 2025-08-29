@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-eaff589e26cec5586b5c3b8811702b9853d8b2e6",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/Bank.sol": "project/contracts/Bank.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/Bank.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\n\ncontract Bank {\n\n    // --------our custom error---------\n    // insufficient funds\n    error InsufficientFunds(uint256 required, uint256 available);\n\n    // for when user tries to transfer to themselves.\n    error SelfTransferNotAllowed();\n\n\n    // ----------let's create our events----------\n    // deposit events\n    event Deposit(address indexed user, uint256 amount, uint256 newBalance);\n\n    // withdraw events\n    event Withdrawal(address indexed user, uint256 amount, uint256 newBalance);\n\n    // transfer events\n    event Transfer (\n        address indexed from,\n        address indexed to,\n        uint256 amount,\n        uint256 newBalanceFrom,\n        uint256 newBalanceTo\n    );\n\n    // mapping to store all users address\n    mapping(address => uint256) public balances;\n\n    /// @dev A payable function that allows a user to deposist Ether into their account.\n    function deposit() public payable {\n        balances[msg.sender] += msg.value;\n\n        // emit for deposit\n        emit Deposit(msg.sender, msg.value, balances[msg.sender]);\n    }\n\n    /// @dev allows a user to withdraw a specified amount of ether from their account.\n    /// @param _amount the amount of ether to withdraw.\n\n    function withdraw(uint256 _amount) public {\n        if(balances[msg.sender] < _amount){\n            revert InsufficientFunds({required: _amount, available: balances[msg.sender]});\n        }\n\n        balances[msg.sender] -= _amount;\n\n        (bool sent,) = payable(msg.sender).call{value: _amount}(\"\");\n        require(sent, \"failed to send ether\");\n\n        // emit for withdrawal\n        emit Withdrawal(msg.sender, _amount, balances[msg.sender]);\n    }\n\n    /// @dev allows a user to transfer ether from their account to another.\n    /// @param _to the address to transfer ether to.\n    /// @param _amount the amount of ether to transfer\n    function transfer(address _to, uint256 _amount) public {\n        if (msg.sender == _to){\n            revert SelfTransferNotAllowed();\n        }\n\n        require(balances[msg.sender] >= _amount, \"Insufficient balance\");\n\n        balances[msg.sender] -= _amount;\n        balances[_to] += _amount;\n\n        emit Transfer(\n            msg.sender,\n            _to,\n            _amount,\n            balances[msg.sender],\n            balances[_to]\n        );\n    }\n\n    ///@dev a view function to get the balance of a user.\n    /// @param _user the address of the user.\n    /// @return the balance of the user.\n\n    function getBalance(address _user) public view returns(uint256){\n        return balances[_user];\n    }\n}"
+      }
+    }
+  }
+}
